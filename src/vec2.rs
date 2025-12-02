@@ -5,12 +5,12 @@ use core::ops::*;
 
 /// A 2-dimensional vector.
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
-pub struct Vec2 {
+pub struct QVec2 {
     pub x: Q64,
     pub y: Q64,
 }
 
-impl Vec2 {
+impl QVec2 {
     /// All zeroes.
     pub const ZERO: Self = Self::splat(Q64::ZERO);
 
@@ -212,7 +212,7 @@ impl Vec2 {
     #[inline]
     #[must_use]
     pub fn clamp(self, min: Self, max: Self) -> Self {
-        assert!(min.x.le(&max.x) && min.y.le(&max.y), "[Vec2::clamp] Expected min <= max.");
+        assert!(min.x.le(&max.x) && min.y.le(&max.y), "[QVec2::clamp] Expected min <= max.");
         self.max(min).min(max)
     }
 
@@ -397,8 +397,8 @@ impl Vec2 {
 
     /// Creates a 2D vector containing `[angle.cos(), angle.sin()]`. This can be used in
     /// conjunction with the [`rotate()`][Self::rotate()] method, e.g.
-    /// `XVec2::from_angle(PI).rotate(XVec2::Y)` will create the vector `[-1, 0]`
-    /// and rotate [`XVec2::Y`] around it returning `-XVec2::Y`.
+    /// `QVec2::from_angle(PI).rotate(QVec2::Y)` will create the vector `[-1, 0]`
+    /// and rotate [`QVec2::Y`] around it returning `-QVec2::Y`.
     #[inline]
     #[must_use]
     pub fn from_angle(angle: Q64) -> Self {
@@ -412,11 +412,11 @@ impl Vec2 {
     /// 
     /// # Panics
     /// 
-    /// Will panic if `self` is `VEC2::ZERO`.
+    /// Will panic if `self` is `QVec2::ZERO`.
     #[inline]
     #[must_use]
     pub fn to_angle(self) -> Q64 {
-        assert!(self.x.ne(&Q64::ZERO) || self.y.ne(&Q64::ZERO), "[Vec2::to_angle] Computeing angle of zero vector, zero is returned.");
+        assert!(self.x.ne(&Q64::ZERO) || self.y.ne(&Q64::ZERO), "[QVec2::to_angle] Computeing angle of zero vector, zero is returned.");
         Q64::atan2(self.y, self.x)
     }
 
@@ -468,16 +468,32 @@ impl Vec2 {
             y: self.y.saturating_mul(rhs.x).saturating_add(self.x.saturating_mul(rhs.y)),
         }
     }
+
+    /// Returns true if the absolute difference of all elements between `self` and `rhs` is
+    /// less than or equal to `max_abs_diff`.
+    ///
+    /// This can be used to compare if two vectors contain similar elements. It works best when
+    /// comparing with a known value. The `max_abs_diff` that should be used used depends on
+    /// the values being compared against.
+    /// 
+    /// SAT
+    #[inline]
+    #[must_use]
+    pub fn abs_diff_eq(self, rhs: Self, max_abs_diff: Q64) -> bool {
+        let dif = self.saturating_sub(rhs).abs();
+        let gap = Self::splat(max_abs_diff);
+        dif.x.le(&gap.x) && dif.y.le(&gap.y)
+    }
 }
 
-impl Default for Vec2 {
+impl Default for QVec2 {
     #[inline(always)]
     fn default() -> Self {
         Self::ZERO
     }
 }
 
-impl Add<Vec2> for Vec2 {
+impl Add<QVec2> for QVec2 {
     type Output = Self;
     #[inline]
     fn add(self, rhs: Self) -> Self {
@@ -488,7 +504,7 @@ impl Add<Vec2> for Vec2 {
     }
 }
 
-impl Sub<Vec2> for Vec2 {
+impl Sub<QVec2> for QVec2 {
     type Output = Self;
     #[inline]
     fn sub(self, rhs: Self) -> Self {
@@ -499,7 +515,7 @@ impl Sub<Vec2> for Vec2 {
     }
 }
 
-impl Mul<Vec2> for Vec2 {
+impl Mul<QVec2> for QVec2 {
     type Output = Self;
     #[inline]
     fn mul(self, rhs: Self) -> Self {
@@ -510,7 +526,7 @@ impl Mul<Vec2> for Vec2 {
     }
 }
 
-impl Div<Vec2> for Vec2 {
+impl Div<QVec2> for QVec2 {
     type Output = Self;
     #[inline]
     fn div(self, rhs: Self) -> Self {
@@ -521,7 +537,39 @@ impl Div<Vec2> for Vec2 {
     }
 }
 
-impl Add<Q64> for Vec2 {
+impl AddAssign<QVec2> for QVec2 {
+    #[inline]
+    fn add_assign(&mut self, rhs: QVec2) {
+        self.x += rhs.x;
+        self.y += rhs.y;
+    }
+}
+
+impl SubAssign<QVec2> for QVec2 {
+    #[inline]
+    fn sub_assign(&mut self, rhs: QVec2) {
+        self.x -= rhs.x;
+        self.y -= rhs.y;
+    }
+}
+
+impl MulAssign<QVec2> for QVec2 {
+    #[inline]
+    fn mul_assign(&mut self, rhs: QVec2) {
+        self.x *= rhs.x;
+        self.y *= rhs.y;
+    }
+}
+
+impl DivAssign<QVec2> for QVec2 {
+    #[inline]
+    fn div_assign(&mut self, rhs: QVec2) {
+        self.x /= rhs.x;
+        self.y /= rhs.y;
+    }
+}
+
+impl Add<Q64> for QVec2 {
     type Output = Self;
     #[inline]
     fn add(self, rhs: Q64) -> Self {
@@ -532,7 +580,7 @@ impl Add<Q64> for Vec2 {
     }
 }
 
-impl Sub<Q64> for Vec2 {
+impl Sub<Q64> for QVec2 {
     type Output = Self;
     #[inline]
     fn sub(self, rhs: Q64) -> Self {
@@ -543,7 +591,7 @@ impl Sub<Q64> for Vec2 {
     }
 }
 
-impl Mul<Q64> for Vec2 {
+impl Mul<Q64> for QVec2 {
     type Output = Self;
     #[inline]
     fn mul(self, rhs: Q64) -> Self {
@@ -554,7 +602,7 @@ impl Mul<Q64> for Vec2 {
     }
 }
 
-impl Div<Q64> for Vec2 {
+impl Div<Q64> for QVec2 {
     type Output = Self;
     #[inline]
     fn div(self, rhs: Q64) -> Self {
@@ -565,7 +613,7 @@ impl Div<Q64> for Vec2 {
     }
 }
 
-impl AddAssign<Q64> for Vec2 {
+impl AddAssign<Q64> for QVec2 {
     #[inline]
     fn add_assign(&mut self, rhs: Q64) {
         self.x += rhs;
@@ -573,7 +621,7 @@ impl AddAssign<Q64> for Vec2 {
     }
 }
 
-impl SubAssign<Q64> for Vec2 {
+impl SubAssign<Q64> for QVec2 {
     #[inline]
     fn sub_assign(&mut self, rhs: Q64) {
         self.x -= rhs;
@@ -581,7 +629,7 @@ impl SubAssign<Q64> for Vec2 {
     }
 }
 
-impl MulAssign<Q64> for Vec2 {
+impl MulAssign<Q64> for QVec2 {
     #[inline]
     fn mul_assign(&mut self, rhs: Q64) {
         self.x *= rhs;
@@ -589,7 +637,7 @@ impl MulAssign<Q64> for Vec2 {
     }
 }
 
-impl DivAssign<Q64> for Vec2 {
+impl DivAssign<Q64> for QVec2 {
     #[inline]
     fn div_assign(&mut self, rhs: Q64) {
         self.x /= rhs;
@@ -597,7 +645,7 @@ impl DivAssign<Q64> for Vec2 {
     }
 }
 
-impl Rem<Vec2> for Vec2 { 
+impl Rem<QVec2> for QVec2 { 
     type Output = Self;
     #[inline]
     fn rem(self, rhs: Self) -> Self {
@@ -608,7 +656,7 @@ impl Rem<Vec2> for Vec2 {
     }
 }
 
-impl Neg for Vec2 {
+impl Neg for QVec2 {
     type Output = Self;
     #[inline]
     fn neg(self) -> Self {
@@ -619,45 +667,45 @@ impl Neg for Vec2 {
     }
 }
 
-impl fmt::Display for Vec2 {
+impl fmt::Display for QVec2 {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "[{}, {}]", self.x, self.y)
     }
 }
 
-impl fmt::Debug for Vec2 {
+impl fmt::Debug for QVec2 {
     fn fmt(&self, fmt: &mut fmt::Formatter<'_>) -> fmt::Result {
-        fmt.debug_tuple(stringify!(Vec2))
+        fmt.debug_tuple(stringify!(QVec2))
             .field(&self.x)
             .field(&self.y)
             .finish()
     }
 }
 
-impl From<[Q64; 2]> for Vec2 {
+impl From<[Q64; 2]> for QVec2 {
     #[inline]
     fn from(a: [Q64; 2]) -> Self {
         Self::new(a[0], a[1])
     }
 }
 
-impl From<Vec2> for [Q64; 2] {
+impl From<QVec2> for [Q64; 2] {
     #[inline]
-    fn from(v: Vec2) -> Self {
+    fn from(v: QVec2) -> Self {
         [v.x, v.y]
     }
 }
 
-impl From<(Q64, Q64)> for Vec2 {
+impl From<(Q64, Q64)> for QVec2 {
     #[inline]
     fn from(t: (Q64, Q64)) -> Self {
         Self::new(t.0, t.1)
     }
 }
 
-impl From<Vec2> for (Q64, Q64) {
+impl From<QVec2> for (Q64, Q64) {
     #[inline]
-    fn from(v: Vec2) -> Self {
+    fn from(v: QVec2) -> Self {
         (v.x, v.y)
     }
 }

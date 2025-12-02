@@ -4,12 +4,12 @@ mod coordic;
 
 pub mod vec2;
 pub mod rng;
-
 pub mod prelude {
     pub use crate::{
         Q64,
         basic::*,
         coordic::*,
+        q64, qvec2,
     };
 }
 
@@ -25,6 +25,6 @@ macro_rules! q64 {
 #[macro_export]
 macro_rules! qvec2 {
     ($x:expr, $y:expr) => {
-        vec2::Vec2::new(q64!($x), q64!($y))
+        QVec2::new(q64!($x), q64!($y))
     };
 }

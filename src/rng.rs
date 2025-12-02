@@ -4,12 +4,12 @@ const N: usize = 624;
 const M: usize = 397;
 
 /// Random number generator using the Mersenne Twister algorithm.
-pub struct Rng {
+pub struct QRng {
     state: [u32; N],
     index: u32,
 }
 
-impl Rng {
+impl QRng {
     /// Initializes the random number seed with a u32 value.
     pub fn from_seed(seed: u32) -> Self {
         let mut mt = Self {
@@ -28,15 +28,15 @@ impl Rng {
     /// Examples
     /// 
     /// ```
-    /// use qmath::rng::*;
+    /// use qmath::prelude::*;
     /// 
-    /// let mut rng = Rng::from_seed(12u32);
+    /// let mut rng = QRng::from_seed(12u32);
     /// for _ in 0..1_000_000 {
-    ///     let random = rng.random();
+    ///     let random = rng.next_unit();
     ///     assert!(random >= 0 && random < 1);
     /// }
     /// ```
-    pub fn random(&mut self) -> Q64 {
+    pub fn next_unit(&mut self) -> Q64 {
         if self.index >= N as u32 {
             self.twist();
         }
