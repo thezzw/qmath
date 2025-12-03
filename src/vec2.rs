@@ -432,7 +432,7 @@ impl QVec2 {
             self.dot(rhs).saturating_div((self.length_squared().saturating_mul(rhs.length_squared())).saturating_sqrt())
         ).clamp(Q64::NEG_ONE, Q64::ONE).acos().1;
 
-        angle * (self.perp_dot(rhs)).signum()
+        angle * (self.cross(rhs)).signum()
     }
 
     /// Returns a vector that is equal to `self` rotated by 90 degrees.
@@ -451,7 +451,7 @@ impl QVec2 {
     /// SAT
     #[inline]
     #[must_use]
-    pub fn perp_dot(self, rhs: Self) -> Q64 {
+    pub fn cross(self, rhs: Self) -> Q64 {
         self.x.saturating_mul(rhs.y).saturating_sub(self.y.saturating_mul(rhs.x))
     }
 
