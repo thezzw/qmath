@@ -2,7 +2,7 @@ use crate::Q64;
 use fixed::traits::Fixed;
 
 /// Elementary functions.
-pub trait Basic: Fixed {
+pub trait QBasic: Fixed {
     /// A very small number.
     const EPS: Self;
     /// Half.
@@ -34,7 +34,7 @@ pub trait Basic: Fixed {
     fn exp(self) -> Self;
 }
 
-impl Basic for Q64 {
+impl QBasic for Q64 {
     const EPS: Self = Self::lit("1.0e-8");
     const HALF: Self = Self::lit("0.5");
     const TWO: Self = Self::lit("2");

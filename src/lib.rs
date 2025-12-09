@@ -4,6 +4,7 @@ mod coordic;
 
 pub mod vec2;
 pub mod rng;
+pub mod dir;
 pub mod prelude {
     pub use crate::{
         Q64,

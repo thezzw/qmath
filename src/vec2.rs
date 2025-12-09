@@ -428,8 +428,10 @@ impl QVec2 {
     #[inline]
     #[must_use]
     pub fn angle_between(self, rhs: Self) -> Q64 {
+        let hypotenuse_length = (self.length_squared().saturating_mul(rhs.length_squared())).saturating_sqrt();
+        assert!(hypotenuse_length.ne(&Q64::ZERO), "[QVec2::angle_between] Computeing angle between zero vectors: {:?} {:?}.", self, rhs);
         let angle = (
-            self.dot(rhs).saturating_div((self.length_squared().saturating_mul(rhs.length_squared())).saturating_sqrt())
+            self.dot(rhs).saturating_div(hypotenuse_length)
         ).clamp(Q64::NEG_ONE, Q64::ONE).acos().1;
 
         angle * (self.cross(rhs)).signum()

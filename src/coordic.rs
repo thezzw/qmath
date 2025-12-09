@@ -1,5 +1,5 @@
 use crate::Q64;
-use crate::basic::Basic;
+use crate::basic::QBasic;
 use fixed::{ types::I4F60, traits::Fixed };
 
 const CIRCLE_I4F60: [(i8, i64, i64); 32] = [
@@ -40,7 +40,7 @@ const CIRCLE_I4F60: [(i8, i64, i64); 32] = [
 const CIRCLE_KN_I4F60: i64 = 700114967507363456;
 
 /// Trigonometric functions.
-pub trait Coordic: Fixed {
+pub trait QCoordic: Fixed {
     /// Returns the Sin and Cos values of an angle in radians as a tuple.
     fn sin_cos(self) -> (Self, Self);
     /// Returns the Sin value of an angle in radians.
@@ -59,7 +59,7 @@ pub trait Coordic: Fixed {
     fn atan2(y: Self, x: Self) -> Self;
 }
 
-impl Coordic for Q64 {
+impl QCoordic for Q64 {
     fn sin_cos(self) -> (Self, Self) {
         // Converts result angle's value into range [-PI/2, PI/2].
         let mut result_factor = Self::from_num(I4F60::from_bits(CIRCLE_KN_I4F60));
@@ -110,7 +110,6 @@ impl Coordic for Q64 {
         sin_cos.0 / sin_cos.1
     }
 
-
     /// # Panics
     ///
     /// ```rust,should_panic
@@ -119,7 +118,7 @@ impl Coordic for Q64 {
     /// let _ = Q64::NEG_TWO.asin();
     /// ```
     fn asin(self) -> (Self, Self) {
-        assert!(self <= 1 && self >= -1, "Sine value should be in range of [-1, 1].");
+        assert!(self <= 1 && self >= -1, "[QCoordic::asin] Sine value should be in range of [-1, 1].");
         
         let mut x = Self::ONE;
         let mut y = Self::ZERO;
@@ -157,7 +156,7 @@ impl Coordic for Q64 {
     /// let _ = Q64::NEG_TWO.acos();
     /// ```
     fn acos(self) -> (Self, Self) {
-        assert!(self <= 1 && self >= -1, "Can't acos value {}, cosine value should be in range of [-1, 1].", self);
+        assert!(self <= 1 && self >= -1, "[QCoordic::acos] Can't acos value {}, cosine value should be in range of [-1, 1].", self);
         
         let mut x = Self::ZERO;
         let mut y = Self::ONE;
@@ -228,7 +227,7 @@ impl Coordic for Q64 {
     /// let _ = Q64::atan2(Q64::ZERO, Q64::ZERO);
     /// ```
     fn atan2(y: Self, x: Self) -> Self {
-        assert!(y != 0 || x != 0, "Both X and Y can't be zero when calculating the tan value.");
+        assert!(y != 0 || x != 0, "[QCoordic::atan2] Both X and Y can't be zero when calculating the tan value.");
         let tan_value = if x == 0 { Self::MAX } else {
             y / x
         };
