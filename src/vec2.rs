@@ -711,3 +711,16 @@ impl From<QVec2> for (Q64, Q64) {
         (v.x, v.y)
     }
 }
+
+impl PartialOrd for QVec2 {
+    #[inline]
+    fn partial_cmp(&self, other: &Self) -> Option<core::cmp::Ordering> {
+        match (self.x.partial_cmp(&other.x), self.y.partial_cmp(&other.y)) {
+            (Some(core::cmp::Ordering::Equal), Some(ord)) => Some(ord),
+            (Some(ord), Some(core::cmp::Ordering::Equal)) => Some(ord),
+            (Some(core::cmp::Ordering::Less), Some(core::cmp::Ordering::Less)) => Some(core::cmp::Ordering::Less),
+            (Some(core::cmp::Ordering::Greater), Some(core::cmp::Ordering::Greater)) => Some(core::cmp::Ordering::Greater),
+            _ => None,
+        }
+    }
+}
