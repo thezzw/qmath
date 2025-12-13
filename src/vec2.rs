@@ -4,7 +4,7 @@ use core::fmt;
 use core::ops::*;
 
 /// A 2-dimensional vector.
-#[derive(Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Hash)]
 pub struct QVec2 {
     pub x: Q64,
     pub y: Q64,
