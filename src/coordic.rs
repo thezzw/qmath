@@ -63,15 +63,15 @@ impl QCoordic for Q64 {
     fn sin_cos(self) -> (Self, Self) {
         // Converts result angle's value into range [-PI/2, PI/2].
         let mut result_factor = Self::from_num(I4F60::from_bits(CIRCLE_KN_I4F60));
-        let mut preliminary_angle = self % ( 2 * Self::PI );
+        let mut preliminary_angle = self % Self::TAU;
         
         if preliminary_angle < 0 { preliminary_angle += 2 * Self::PI }
-        if preliminary_angle > Self::PI / 2 && preliminary_angle < Self::PI * 3 / 2 {
+        if preliminary_angle > Self::FRAC_PI_2 && preliminary_angle < Self::FRAC_PI_2 + Self::PI {
             result_factor = -result_factor;
             if preliminary_angle < Self::PI { preliminary_angle += Self::PI }
             else { preliminary_angle -= Self::PI }
         }
-        if preliminary_angle >= Self::PI * 3 / 2 { preliminary_angle -= 2 * Self::PI; }
+        if preliminary_angle >= Self::FRAC_PI_2 + Self::PI { preliminary_angle -= Self::TAU; }
         
         // Coordinates rotate.
         let mut x = Self::ONE;
@@ -107,7 +107,7 @@ impl QCoordic for Q64 {
             if sin_cos.0 > 0 { return Self::MAX; }
             else { return Self::MIN; }
         }
-        sin_cos.0 / sin_cos.1
+        sin_cos.0.saturating_div(sin_cos.1)
     }
 
     /// # Panics
@@ -160,7 +160,7 @@ impl QCoordic for Q64 {
         
         let mut x = Self::ZERO;
         let mut y = Self::ONE;
-        let mut z = Self::PI / 2;
+        let mut z = Self::FRAC_PI_2;
         
         let (mut xv, mut yv);
         for (k, rad, cos) in CIRCLE_I4F60 {
@@ -229,7 +229,7 @@ impl QCoordic for Q64 {
     fn atan2(y: Self, x: Self) -> Self {
         assert!(y != 0 || x != 0, "[QCoordic::atan2] Both X and Y can't be zero when calculating the tan value.");
         let tan_value = if x == 0 { Self::MAX } else {
-            y / x
+            y.saturating_div(x)
         };
         let opt_rst = tan_value.atan();
         if y < Self::ZERO { return opt_rst.0; }
