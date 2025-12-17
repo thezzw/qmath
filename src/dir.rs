@@ -1,6 +1,6 @@
 use crate::prelude::*;
 use crate::vec2::QVec2;
-
+use serde::{Deserialize, Serialize};
 use core::ops::*;
 
 /// A 2-dimensional direction.
@@ -8,7 +8,7 @@ use core::ops::*;
 /// Angle in radians, within [0, 2PI), CCW order.
 /// 
 /// QDir of `QVec2::X` is zero.
-#[derive(Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct QDir {
     angle: Q64,
 }
