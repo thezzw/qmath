@@ -37,19 +37,24 @@ impl QDir {
         }
     }
 
-    pub fn angle(self) -> Q64 {
+    pub fn angle(&self) -> Q64 {
         self.angle
     }
 
-    pub fn to_vec(self) -> QVec2 {
+    pub fn to_vec(&self) -> QVec2 {
         QVec2::from_angle(self.angle)
     }
 
-    pub fn rotate_dir(self, other: QDir) -> QDir {
+    pub fn rotate(&mut self, angle: Q64) {
+        let new_dir = Self::new_from_angle(self.angle + angle);
+        self.angle = new_dir.angle
+    }
+
+    pub fn rotate_dir(&self, other: QDir) -> QDir {
         QDir::new_from_angle(self.angle + other.angle)
     }
 
-    pub fn rotate_vec(self, vec: QVec2) -> QVec2 {
+    pub fn rotate_vec(&self, vec: QVec2) -> QVec2 {
         self.to_vec().rotate(vec)
     }
 }
