@@ -8,7 +8,7 @@ use core::ops::*;
 /// Angle in radians, within [0, 2PI), CCW order.
 /// 
 /// QDir of `QVec2::X` is zero.
-#[derive(Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct QDir {
     angle: Q64,
 }
@@ -56,6 +56,10 @@ impl QDir {
 
     pub fn rotate_vec(&self, vec: QVec2) -> QVec2 {
         self.to_vec().rotate(vec)
+    }
+
+    pub fn projection_of(&self, vec: QVec2) -> Q64 {
+        self.to_vec().dot(vec)
     }
 }
 

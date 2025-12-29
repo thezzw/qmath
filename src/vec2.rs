@@ -1,3 +1,4 @@
+use crate::dir::QDir;
 use crate::prelude::*;
 use serde::{Deserialize, Serialize};
 use core::fmt;
@@ -416,7 +417,7 @@ impl QVec2 {
     #[inline]
     #[must_use]
     pub fn to_angle(self) -> Q64 {
-        assert!(self.x.ne(&Q64::ZERO) || self.y.ne(&Q64::ZERO), "[QVec2::to_angle] Computeing angle of zero vector, zero is returned.");
+        assert!(self.x.ne(&Q64::ZERO) || self.y.ne(&Q64::ZERO), "[QVec2::to_angle] Computeing angle of zero vector.");
         Q64::atan2(self.y, self.x)
     }
 
@@ -485,6 +486,27 @@ impl QVec2 {
         let dif = self.saturating_sub(rhs).abs();
         let gap = Self::splat(max_abs_diff);
         dif.x.le(&gap.x) && dif.y.le(&gap.y)
+    }
+
+    /// Returns the dir of this vector.
+    /// 
+    /// The input does not need to be a unit vector however it must be non-zero.
+    /// 
+    /// # Panics
+    /// 
+    /// Will panic if `self` is `QVec2::ZERO`.
+    #[inline]
+    #[must_use]
+    pub fn to_dir(self) -> QDir {
+        assert!(self.x.ne(&Q64::ZERO) || self.y.ne(&Q64::ZERO), "[QVec2::to_dir] Computeing dir of zero vector, zero is returned.");
+        QDir::new_from_vec(self)
+    }
+
+    /// Creates a 2D normalized vector from a dir. 
+    #[inline]
+    #[must_use]
+    pub fn from_dir(dir: QDir) -> Self {
+        dir.to_vec()
     }
 }
 
