@@ -32,6 +32,8 @@ pub trait QBasic: Fixed {
     fn powi(self, n: isize) -> Self;
     /// Computes and returns the exponential function of a number.
     fn exp(self) -> Self;
+    /// Half of a number.
+    fn half(self) -> Self;
 }
 
 impl QBasic for Q64 {
@@ -130,5 +132,9 @@ impl QBasic for Q64 {
             rst = rst + term;
         }
         rst
+    }
+
+    fn half(self) -> Self {
+        self.saturating_mul(Self::HALF)
     }
 }
